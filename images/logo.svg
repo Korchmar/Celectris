@@ -1,0 +1,6 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Main C Shape -->
+    <path d="M165 55C165 30.1472 144.853 10 120 10H80C41.3401 10 10 41.3401 10 80V120C10 164.283 45.7174 200 90 200H100" stroke="#2563EB" stroke-width="35" stroke-linecap="round"/>
+    <!-- Bottom Segment -->
+    <path d="M135 140C155 140 175 155 185 175" stroke="#2563EB" stroke-width="35" stroke-linecap="round"/>
+</svg>

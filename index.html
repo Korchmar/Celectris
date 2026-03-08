@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celectris — Агрегатор электротранспорта для курьеров</title>
+        <!-- === FAVICON (ИКОНКА ВО ВКЛАДКЕ) === -->
+    <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+    <link rel="icon" type="image/png" href="images/logo.svg">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+    <meta name="description" content="Celectris объединяет курьеров и арендодателей электровелосипедов. Аренда за 2 минуты, авто-договор, проверенные партнёры.">
+    <meta name="keywords" content="аренда электровелосипедов, курьеры, доставка, электротранспорт, агрегатор, стартап">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    fontSize: {
+                        'h1': ['56px', { lineHeight: '1.2', fontWeight: '700' }],
+                        'h2': ['36px', { lineHeight: '1.3', fontWeight: '700' }],
+                        'body': ['18px', { lineHeight: '1.5', fontWeight: '400' }],
+                        'btn': ['16px', { lineHeight: '1.5', fontWeight: '500' }],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        /* Background Blobs - Constrained within viewport */
+        .blob {
+            position: fixed;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 10s infinite ease-in-out;
+            pointer-events: none;
+        }
+        
+        .blob-1 { top: -5%; left: -5%; width: 400px; height: 400px; background: #bfdbfe; border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+        .blob-2 { bottom: -5%; right: -5%; width: 500px; height: 500px; background: #e0f2fe; border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; animation-delay: -5s; }
+        .blob-3 { top: 40%; left: 40%; width: 300px; height: 300px; background: #f0f9ff; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; animation-delay: -2s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(20px, 40px) rotate(10deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* Prevent scroll beyond content */
+        main {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+
+        /* Offset for fixed navbar */
+        section[id] {
+            scroll-margin-top: 100px;
+        }
+    </style>
+</head>
+<body class="antialiased relative">
+
+    <!-- Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass rounded-2xl mt-4 px-6 py-4 flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center gap-3 cursor-pointer">
+                    <svg width="48" height="48" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Main C Shape -->
+                        <path d="M165 55C165 30.1472 144.853 10 120 10H80C41.3401 10 10 41.3401 10 80V120C10 164.283 45.7174 200 90 200H100" stroke="#2563EB" stroke-width="35" stroke-linecap="round"/>
+                        <!-- Bottom Segment -->
+                        <path d="M135 140C155 140 175 155 185 175" stroke="#2563EB" stroke-width="35" stroke-linecap="round"/>
+                    </svg>
+                    <span class="text-2xl font-bold text-slate-800 tracking-tight">Celectris</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#about" class="text-slate-600 hover:text-brand-600 font-medium transition-colors">О проекте</a>
+                    <a href="#problem" class="text-slate-600 hover:text-brand-600 font-medium transition-colors">Проблема</a>
+                    <a href="#solution" class="text-slate-600 hover:text-brand-600 font-medium transition-colors">Решение</a>
+                    <a href="#contacts" class="text-slate-600 hover:text-brand-600 font-medium transition-colors">Контакты</a>
+                </div>
+
+                <!-- CTA Button -->
+                <div class="hidden md:block">
+                    <a href="#contacts" class="bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg shadow-brand-500/30 transform hover:-translate-y-0.5">
+                        Связаться с нами
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button class="text-slate-600 focus:outline-none">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper -->
+    <main>
+        <!-- Hero Section (About) -->
+        <section id="about" class="pt-40 pb-20 lg:pt-48 lg:pb-32 relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    
+                    <!-- Text Content -->
+                    <div class="text-center lg:text-left z-10">
+                        <div class="inline-block px-4 py-2 rounded-full bg-brand-50 border border-brand-100 text-brand-700 font-medium text-sm mb-6 animate-fade-in-up">
+                            🚀 Пилотный запуск в 2026 году
+                        </div>
+                        <h1 class="text-h1 text-slate-900 mb-6 leading-tight">
+                            Celectris — агрегатор <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-cyan-500">электротранспорта для курьеров</span>
+                        </h1>
+                        <p class="text-body text-slate-600 mb-8 max-w-xl mx-auto lg:mx-0">
+                            Курьеры арендуют велосипеды и скутеры в два клика. Арендодатели получают клиентов без затрат на рекламу.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                            <a href="#how-it-works" class="bg-brand-600 hover:bg-brand-700 text-white text-btn px-8 py-4 rounded-xl font-medium transition-all shadow-xl shadow-brand-500/20 transform hover:-translate-y-1">
+                                Как это работает
+                            </a>
+                            <a href="#contacts" class="glass text-slate-700 hover:bg-white text-btn px-8 py-4 rounded-xl font-medium transition-all border-slate-200">
+                                Скачать презентацию
+                            </a>
+                        </div>
+                        
+                        <div class="mt-10 flex items-center justify-center lg:justify-start gap-4 text-sm text-slate-500">
+                            <div class="flex -space-x-2">
+                                <div class="w-8 h-8 rounded-full bg-slate-200 border-2 border-white"></div>
+                                <div class="w-8 h-8 rounded-full bg-slate-300 border-2 border-white"></div>
+                                <div class="w-8 h-8 rounded-full bg-slate-400 border-2 border-white"></div>
+                            </div>
+                            <p>0+ Проведено интервью с курьерами и арендодателями</p>
+                        </div>
+                    </div>
+
+                    <!-- Image Content -->
+                    <div class="relative z-10 lg:h-[600px] flex items-center justify-center">
+                        <div class="relative w-full h-full max-w-lg mx-auto">
+                            <!-- Decorative blurred circle behind image -->
+                            <div class="absolute inset-0 bg-brand-200 rounded-full filter blur-[100px] opacity-40 animate-pulse"></div>
+                            
+                            <!-- Main Image Container with Glass Effect -->
+                            <div class="glass-card rounded-3xl overflow-hidden shadow-2xl relative h-[500px] w-full transform rotate-2 hover:rotate-0 transition-transform duration-500">
+                                <img src="https://image.qwenlm.ai/public_source/ff1acf35-f140-4775-9087-89778c582471/170ee4ef3-2742-41ee-b48b-f9e141c32dce.png" alt="Electric Transport" class="w-full h-full object-cover">
+                                
+                                <!-- Floating Badge -->
+                                <div class="absolute bottom-6 left-6 glass px-4 py-3 rounded-xl flex items-center gap-3">
+                                    <div class="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+                                    <div class="w-3 h-3 bg-green-500 rounded-full absolute"></div>
+                                    <span class="font-bold text-slate-800">0 Партнёров готовы к пилоту</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem Section -->
+        <section id="problem" class="py-20 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-h2 text-slate-900 mb-4">Почему текущий рынок не работает</h2>
+                    <p class="text-body text-slate-600 max-w-2xl mx-auto">Рынок аренды для курьеров разрознен и неэффективен</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Problem 1 -->
+                    <div class="glass-card p-8 rounded-3xl">
+                        <div class="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center mb-6 text-red-600">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Долгий поиск</h3>
+                        <p class="text-slate-600">Курьеры тратят часы на поиск транспорта в чатах и на Авито</p>
+                    </div>
+
+                    <!-- Problem 2 -->
+                    <div class="glass-card p-8 rounded-3xl">
+                        <div class="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mb-6 text-orange-600">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Простой техники</h3>
+                        <p class="text-slate-600">Арендодатели теряют до 30% времени на простой техники</p>
+                    </div>
+
+                    <!-- Problem 3 -->
+                    <div class="glass-card p-8 rounded-3xl">
+                        <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 text-amber-600">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Ручное оформление</h3>
+                        <p class="text-slate-600">Договоры, оплата, гарантии — всё вручную, без гарантий</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solution Section -->
+        <section id="solution" class="py-20 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-h2 text-slate-900 mb-4">Что предлагает Celectris?</h2>
+                    <p class="text-body text-slate-600 max-w-3xl mx-auto">Единое приложение, где курьеры находят транспорт за минуты, а арендодатели получают готовых клиентов</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <!-- Solution Item 1 -->
+                    <div class="glass-card p-6 rounded-2xl flex items-start gap-4">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 text-green-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 mb-1">Карта со всеми свободными байками рядом</h4>
+                            <p class="text-slate-600 text-sm">Мгновенный поиск доступного транспорта на карте</p>
+                        </div>
+                    </div>
+
+                    <!-- Solution Item 2 -->
+                    <div class="glass-card p-6 rounded-2xl flex items-start gap-4">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 text-green-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 mb-1">Аренда оформляется за 2 минуты с авто-договором</h4>
+                            <p class="text-slate-600 text-sm">Цифровое подписание и автоматизация документов</p>
+                        </div>
+                    </div>
+
+                    <!-- Solution Item 3 -->
+                    <div class="glass-card p-6 rounded-2xl flex items-start gap-4">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 text-green-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 mb-1">Проверенные партнёры и прозрачные условия</h4>
+                            <p class="text-slate-600 text-sm">Верификация арендодателей и честные тарифы</p>
+                        </div>
+                    </div>
+
+                    <!-- Solution Item 4 -->
+                    <div class="glass-card p-6 rounded-2xl flex items-start gap-4">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 text-green-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 mb-1">Арендодатели получают клиентов без затрат на рекламу</h4>
+                            <p class="text-slate-600 text-sm">Готовый поток заказов без маркетинговых расходов</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-12">
+                    <p class="text-body text-slate-500 italic">Мы не владеем техникой — мы делаем рынок аренды прозрачным</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="py-20 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-h2 text-slate-900 mb-4">Как это работает</h2>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- For Couriers -->
+                    <div class="glass-card p-8 rounded-3xl">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center text-brand-600">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900">Для курьеров 🛵</h3>
+                        </div>
+                        <ol class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
+                                <span class="text-slate-600">Открывает карту в приложении</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
+                                <span class="text-slate-600">Выбирает байк по цене и локации</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
+                                <span class="text-slate-600">Подписывает договор онлайн</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</span>
+                                <span class="text-slate-600">Забирает транспорт и работает</span>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <!-- For Renters -->
+                    <div class="glass-card p-8 rounded-3xl">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center text-cyan-600">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-900">Для арендодателей 🏢</h3>
+                        </div>
+                        <ol class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 bg-cyan-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
+                                <span class="text-slate-600">Регистрирует парк в личном кабинете</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 bg-cyan-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
+                                <span class="text-slate-600">Загружает фото и условия аренды</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 bg-cyan-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
+                                <span class="text-slate-600">Получает готовые заявки</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-6 h-6 bg-cyan-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</span>
+                                <span class="text-slate-600">Автоматический учёт и выплаты</span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section id="contacts" class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="glass rounded-3xl p-10 md:p-16 text-center">
+                    <h2 class="text-h2 text-slate-900 mb-4">Готовы изменить рынок аренды вместе?</h2>
+                    <p class="text-body text-slate-600 max-w-2xl mx-auto mb-8">Ищем партнёров для пилотного запуска в Санкт - Петербурге]</p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="https://t.me/lebgris" class="bg-brand-600 hover:bg-brand-700 text-white text-btn px-8 py-4 rounded-xl font-medium transition-all shadow-xl shadow-brand-500/20 transform hover:-translate-y-1">
+                            Связаться
+                        </a>
+                        <a href="https://disk.yandex.ru/i/ZwFyA3UNIv3H3w" class="glass text-slate-700 hover:bg-white text-btn px-8 py-4 rounded-xl font-medium transition-all border-slate-200">
+                            Скачать презентацию (PDF)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Footer -->
+        <section class="py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-wrap justify-center gap-8 md:gap-16 text-center">
+                    <div>
+                        <div class="text-4xl font-bold text-brand-600 mb-1">0+</div>
+                        <div class="text-sm text-slate-500 font-medium">Интервью</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold text-brand-600 mb-1">0</div>
+                        <div class="text-sm text-slate-500 font-medium">Партнёров</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold text-brand-600 mb-1">MVP</div>
+                        <div class="text-sm text-slate-500 font-medium">в разработке</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-slate-200/60 bg-white/30 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <svg width="32" height="32" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M165 55C165 30.1472 144.853 10 120 10H80C41.3401 10 10 41.3401 10 80V120C10 164.283 45.7174 200 90 200H100" stroke="#2563EB" stroke-width="35" stroke-linecap="round"/>
+                        <path d="M135 140C155 140 175 155 185 175" stroke="#2563EB" stroke-width="35" stroke-linecap="round"/>
+                    </svg>
+                    <span class="text-xl font-bold text-slate-800">Celectris</span>
+                </div>
+                <div class="text-slate-500 text-sm text-center md:text-left">
+                    <p class="mb-2">© 2026. Celectris</p>
+                    <p>📧 Email: <a href="mailto:[g.lebedev04@mail.ru]" class="text-brand-600 hover:underline">g.lebedev04@mail.ru</a></p>
+                    <p>📍 Город: Санкт - Петербург</p>
+                </div>
+                <div class="flex space-x-6">
+                    <!-- Telegram -->
+                    <a href="https://t.me/[ВАШ_НИК]" class="text-slate-400 hover:text-brand-600 transition-colors">
+                        <span class="sr-only">Telegram</span>
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.12.033.382.024.592-.018 1.897-.962 6.502-1.361 8.627-.168.9-.5 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                        </svg>
+                    </a>
+                    <!-- VK -->
+                    <a href="#" class="text-slate-400 hover:text-brand-600 transition-colors">
+                        <span class="sr-only">VK</span>
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15.07294,2H8.9375C3.33331,2,2,3.33331,2,8.92706V15.0625C2,20.66663,3.32294,22,8.92706,22H15.0625C20.66669,22,22,20.67706,22,15.07288V8.9375C22,3.33331,20.67706,2,15.07294,2Zm3.07287,14.27081H16.6875c-.55206,0-.71875-.44793-1.70831-1.4375-.86463-.83331-1.22919-.9375-1.44794-.9375-.30206,0-.38544.08332-.38544.5v1.3125c0,.35419-.11456.5625-1.04162.5625a5.69214,5.69214,0,0,1-4.44794-2.66668A11.62611,11.62611,0,0,1,5.35419,8.77081c0-.21875.08331-.41668.5-.41668H7.3125c.375,0,.51044.16668.65625.55212.70831,2.08331,1.91669,3.89581,2.40625,3.89581.1875,0,.27081-.08331.27081-.55206V10.10413c-.0625-.97913-.58331-1.0625-.58331-1.41663a.36008.36008,0,0,1,.375-.33337h2.29169c.3125,0,.41662.15625.41662.53125v2.89587c0,.3125.13544.41663.22919.41663.1875,0,.33331-.10413.67706-.44788a11.99877,11.99877,0,0,0,1.79169-2.97919.62818.62818,0,0,1,.63544-.41668H17.9375c.4375,0,.53125.21875.4375.53125A18.20507,18.20507,0,0,1,16.41669,12.25c-.15625.23956-.21875.36456,0,.64581.14581.21875.65625.64582,1,1.05207a6.48553,6.48553,0,0,1,1.22912,1.70837C18.77081,16.0625,18.5625,16.27081,18.14581,16.27081Z"/>
+                        </svg>
+                    </a>
+                    <!-- Email -->
+                    <a href="mailto:[ВАШ_EMAIL@EXAMPLE.COM]" class="text-slate-400 hover:text-brand-600 transition-colors">
+                        <span class="sr-only">Email</span>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
+
